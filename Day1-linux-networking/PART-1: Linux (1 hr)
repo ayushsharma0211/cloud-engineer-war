@@ -1,1 +1,169 @@
+Day-1: Linux Basics - DevOps Foundation
+
+Introduction to Linux in DevOps
+
+Why Linux is Crucial for DevOps?
+
+-Foundation of DevOps: 90%+ DevOps tools & pipelines Linux-based hai
+
+-Cloud Compatibility: AWS, Azure, GCP ke servers mostly Linux pe chalti hain
+
+-Automation Friendly: Scripting aur automation Linux me natural fit hai
+
+-Containerization: Docker, Kubernetes Linux kernel pe depend karte hain
+
+
+File System Navigation Commands
+Basic Directory Operations
+
+pwd   ------------------- >   Present Working Directory - current location
+ls    -------------------->   List files/folders (basic)
+ls -l -------------------->   Detailed list with permissions
+ls -la ------------------->   All files including hidden ones
+cd <directory> --------------->  Change directory
+cd .. ------------------------>  Parent directory me jao
+cd ~  ------------------------>  Home directory me jao
+
+
+File & Folder Management
+
+mkdir devopswar ---------------->              New folder create karna
+touch day1.txt ----------------->              Empty file create karna
+rm day1.txt  ------------------->              File delete karna
+rm -r devopswar  --------------->              Folder aur uski contents delete karna
+cp file1.txt file2.txt ------------------>     Copy file
+mv file1.txt newname.txt ---------------->     Rename/Move file
+
+
+🔐 File Permissions & Ownership (Detailed)
+Permission Structure
+
+-rw-r--r-- 1 user group 0 Apr 15 10:00 day1.txt
+└─┬─┘ └─┬─┘ └─┬─┘
+  │     │     └── Others: r-- = read only
+  │     └─────── Group: r-- = read only  
+  └───────────── Owner: rw- = read + write
+
+
+Permission Codes
+#	        Permission	       File	                                  Directory
+0	        ---	               No access	                            No access
+1	        --x	               Execute	                              Access only
+2	        -w-	               Write	                                Create/delete
+3	        -wx	               Write+Execute	                        Modify contents
+4	        r--	               Read	                                  List contents
+5	        r-x	               Read+Execute	                          List & access
+6	        rw-	               Read+Write	                            List & modify
+7	        rwx	               All	                                  Full control
+
+
+chmod Examples
+
+chmod 644 day1.txt        # Owner: RW, Group: R, Others: R
+chmod 755 script.sh       # Owner: RWX, Group: RX, Others: RX
+chmod 700 secret.txt      # Only owner can access
+chmod +x script.sh        # Add execute permission to all
+
+
+Ownership Commands
+
+whoami                               # Current user ka naam
+id                                   # User aur group details
+sudo chown user:group file.txt       # Owner aur group change karna
+sudo chgrp devops file.txt           # Group change karna
+
+
+📝 Text Editors for DevOps
+Nano (Beginner Friendly)
+
+nano day1.txt             # File open/edit karna
+# Ctrl + O → Save
+# Ctrl + X → Exit
+# Ctrl + K → Cut line
+# Ctrl + U → Paste
+
+
+Vim (Advanced - DevOps me commonly use hota hai)
+
+vim day1.txt              # Open in Vim
+# i → Insert mode
+# Esc → Command mode
+# :w → Save
+# :q → Quit
+# :wq → Save & Quit
+# :q! → Force quit without saving
+
+
+💾 System Monitoring Commands
+Disk & Storage
+
+df -h                     # Disk free space (human readable)
+du -sh *                  # Directory sizes in current location
+du -h --max-depth=1       # Subdirectory sizes
+
+# Examples output:
+# Filesystem      Size  Used Avail Use% Mounted on
+# /dev/sda1        20G   15G  3.8G  80% /
+
+
+Process & System Info
+
+top                       # Live system processes
+htop                      # Better version of top (install karna padega)
+ps aux                    # All running processes
+free -h                  # RAM usage
+uptime                   # System uptime & load average
+
+
+🚀 DevOps-Specific Linux Concepts
+
+1. SSH (Secure Shell)
+
+ssh username@server_ip    # Remote server connect karna
+ssh-keygen               # SSH keys generate karna (GitHub, servers ke liye)
+
+2. Package Management
+
+# Ubuntu/Debian
+sudo apt update
+sudo apt install git docker nginx
+
+# RHEL/CentOS
+sudo yum update
+sudo yum install git docker
+
+3. Service Management
+
+sudo systemctl start nginx     # Service start karna
+sudo systemctl stop nginx      # Service stop karna
+sudo systemctl status nginx    # Service status check karna
+sudo systemctl enable nginx    # Boot time pe auto-start ke liye
+
+4. Logs Dekhna (Debugging ke liye important)
+
+tail -f /var/log/syslog        # Live logs dekho
+cat /var/log/auth.log          # Authentication logs
+journalctl -xe                 # Systemd logs
+
+
+Day-1 Summary Checklist --------
+
+->  Basic navigation commands (pwd, ls, cd)
+
+-> File operations (touch, mkdir, rm)
+
+-> File permissions (chmod, ls -l)
+
+-> Text editing (nano)
+
+-> System info (df, whoami)
+
+-> GitHub pe notes upload kiye
+
+_> Homework: man command se 2 commands ka manual padho (e.g., man ls, man chmod)
+
+Pro Tip: Linux me "RTFM" (Read The F* Manual) culture hai. man <command> ya <command> --help se detailed help milti hai. Kabhi bhi atak jao toh manual check karo!
+
+
+
 
