@@ -1,1 +1,570 @@
+Day 1 - Part 2: Networking Fundamentals for DevOps
+
+🌐 Why Networking Matters in DevOps?
+
+The DevOps Networking Mindset
+
+->  Not just servers, but connected systems: DevOps engineer banne ke liye servers ko aapas me aur internet se connect karna aana chahiye
+
+->  Everything is a service: Har application network pe chalti hai
+
+->  Cloud = Network + Servers: AWS, Azure, GCP sab networking principles pe based hain
+
+
+-------Real-World Scenarios--------
+
+Web Server (Port 80) → Load Balancer → Database (Port 3306)
+      ↓
+User's Browser (Internet) → DNS → Your Server
+
+
+🔑 Core Networking Concepts - Detailed
+
+1. IP Address - Ghar ka Pata
+
+.........Check your IP address..........
+ip a            ------------->             All network interfaces
+hostname -I     ------------->             Only IP addresses
+ifconfig       -------------->             Old command (deprecated)
+
+--->   Output Example:
+--->   enp0s3: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500
+--->   inet 192.168.1.100/24 brd 192.168.1.255 scope global dynamic noprefixroute enp0s3
+
+
+Key Points:
+
+-> IPv4: 192.168.1.100 (32-bit, most common)
+
+-> IPv6: 2001:0db8:85a3:0000:0000:8a2e:0370:7334 (128-bit, future)
+
+-> CIDR Notation: /24 means subnet mask 255.255.255.0
+
+-> Private IP Ranges:
+
+--------> 10.0.0.0 - 10.255.255.255 (Large companies)
+
+--------> 172.16.0.0 - 172.31.255.255 (Medium networks)
+
+--------> 192.168.0.0 - 192.168.255.255 (Home/Office)
+
+
+2. Subnet - Society/Colony
+
+# Check network route
+ip route show
+route -n
+
+-> Output:
+-> default via 192.168.1.1 dev enp0s3 proto dhcp metric 100
+-> 192.168.1.0/24 dev enp0s3 proto kernel scope link src 192.168.1.100 metric 100
+
+
+Subnetting Example:
+
+IP: 192.168.1.100/24
+Network: 192.168.1.0
+Broadcast: 192.168.1.255
+Usable IPs: 192.168.1.1 to 192.168.1.254
+Subnet Mask: 255.255.255.0
+
+
+3. Gateway - Society ka Main Gate
+
+-> Gateway = Router = Default route to internet
+
+-> Usually: 192.168.1.1 or 10.0.0.1
+
+# Find gateway
+ip route | grep default
+
+
+4. DNS - Phonebook
+
+->  Check DNS servers
+    cat /etc/resolv.conf
+
+->  DNS testing commands
+    nslookup google.com
+    dig google.com                # More detailed
+    host google.com
+
+-> Output:
+-> Server:         8.8.8.8
+-> Address:        8.8.8.8#53
+-> Non-authoritative answer:
+-> Name:   google.com
+-> Address: 142.250.182.46
+
+Popular DNS Servers:
+
+-->  Google: 8.8.8.8, 8.8.4.4
+
+-->  Cloudflare: 1.1.1.1, 1.0.0.1
+
+-->  OpenDNS: 208.67.222.222
+
+
+🚪 Ports & Services - Ghar ke Rooms
+
+Common Ports Every DevOps Engineer Should Know
+
+--->  Check listening ports
+
+sudo ss -tulnp                # Modern (recommended)
+sudo netstat -tulnp           # Old but works
+
+->  Output columns:
+->  State      Recv-Q Send-Q Local Address:Port  Peer Address:Port
+->  LISTEN     0      128    0.0.0.0:22          0.0.0.0:*       users:(("sshd",pid=123,fd=3))
+
+
+Essential Ports Table
+
+Port	         Service	         Protocol	           Use in DevOps
+22	           SSH	             TCP	               Server management, Git operations
+80	           HTTP	             TCP	               Web traffic (unencrypted)
+443          	 HTTPS	           TCP	               Secure web traffic
+53	           DNS	             UDP/TCP	           Domain name resolution
+3306	         MySQL	           TCP	               Database connections
+5432	         PostgreSQL	       TCP	               Database connections
+27017	         MongoDB	         TCP	               NoSQL database
+8080	         Jenkins/Tomcat	   TCP	               CI/CD tools, Java apps
+9000	         Portainer	       TCP	               Docker management
+3000	         Node.js	         TCP	               Development servers
+6379	         Redis	           TCP	               Caching service
+
+
+🔐 SSH (Secure Shell) - DevOps ka Best Friend
+
+SSH Key Generation & Management
+
+-> Generate SSH key pair
+ssh-keygen -t rsa -b 4096 -C "your_email@example.com"
+
+-> -t: Type (rsa, ed25519)
+-> -b: Bits (4096 recommended)
+-> -C: Comment (usually email)
+
+--> Files created:
+
+->>   ~/.ssh/id_rsa      → Private key (NEVER SHARE!)
+->>   ~/.ssh/id_rsa.pub  → Public key (share with servers/GitHub)
+
+--> Check key fingerprint
+   ssh-keygen -l -f ~/.ssh/id_rsa.pub
+
+-->  Copy public key to server (password-less login)
+     ssh-copy-id username@server_ip
+
+
+------- >>> SSH Config File (Time Saver!)
+
+->  Create/edit SSH config
+    nano ~/.ssh/config
+
+->  Add:
+Host myserver
+    HostName 192.168.1.100
+    User ubuntu
+    IdentityFile ~/.ssh/id_rsa
+    Port 22
+
+# Now connect with just:
+ssh myserver
+
+
+SSH Tunnel (Port Forwarding)
+
+-->  Local port forwarding
+
+ssh -L 8080:localhost:80 user@server
+
+--> Browser me localhost:8080 open karo → server ka port 80 dikhega
+
+--> Remote port forwarding
+
+ssh -R 3000:localhost:8080 user@server
+
+--> Server pe port 3000 → your local 8080 connect hoga
+
+
+🌍 Internet Testing & Troubleshooting
+
+  Connectivity Testing Commands
+
+---> Basic ping
+ping -c 4 google.com          # 4 packets bhejo
+ping -i 2 8.8.8.8             # Every 2 seconds
+
+---> Trace route (packet ka rasta dekho)
+traceroute google.com
+mtr google.com                # Real-time traceroute
+
+---> Network speed test
+speedtest-cli                 # Install: sudo apt install speedtest-cli
+
+---> Check MTU (Maximum Transmission Unit)
+ping -s 1472 -M do 8.8.8.8    # Fragment avoidance test
+
+
+HTTP/Web Testing  ------------->>>>>
+
+->   Download/Test web pages
+curl https://google.com                # HTML fetch
+curl -I https://google.com             # Only headers
+curl -v https://google.com             # Verbose (full details)
+
+->   Download files
+wget https://example.com/file.zip
+wget -O customname.zip https://example.com/file.zip
+
+->   API Testing (DevOps me bahut use)
+curl -X GET "https://api.github.com/users/octocat"
+curl -X POST -H "Content-Type: application/json" -d '{"name":"test"}' https://api.example.com
+
+
+🔥 Firewall & Security (UFW - Uncomplicated Firewall)
+--->Basic Firewall Setup
+
+---> Check status
+sudo ufw status
+sudo ufw status numbered      # Rule numbers ke sath
+
+---> Enable/Disable
+sudo ufw enable
+sudo ufw disable
+
+---> Default policies
+sudo ufw default deny incoming   # Sab block karo
+sudo ufw default allow outgoing  # Sab allow karo
+
+---> Allow specific ports
+sudo ufw allow 22/tcp           # SSH
+sudo ufw allow 80/tcp           # HTTP
+sudo ufw allow 443/tcp          # HTTPS
+sudo ufw allow 9090/tcp         # Custom port
+
+---> Allow from specific IP
+sudo ufw allow from 192.168.1.50 to any port 22
+
+---> Delete rule
+sudo ufw delete allow 80
+sudo ufw delete 3              # Rule number 3 delete karo
+
+
+--------------->>>>  Advanced Firewall Rules
+
+---->> Rate limiting (DDoS protection)
+       sudo ufw limit 22/tcp
+
+---->> Allow port range
+       sudo ufw allow 8000:9000/tcp
+
+---->> Deny specific IP
+       sudo ufw deny from 203.0.113.4
+
+----->>> Application profiles
+sudo ufw app list              # Available apps
+sudo ufw allow 'Nginx Full'    # Predefined profile
+
+
+-------->>> 🔧 Network Configuration Files
+1. Network Interfaces (/etc/netplan/)
+
+yaml -----------
+
+-> Ubuntu 18.04+ (Netplan)
+sudo nano /etc/netplan/01-netcfg.yaml
+
+network:
+  version: 2
+  ethernets:
+    eth0:
+      dhcp4: no
+      addresses:
+        - 192.168.1.100/24
+      gateway4: 192.168.1.1
+      nameservers:
+        addresses: [8.8.8.8, 1.1.1.1]
+
+-> Apply changes
+sudo netplan apply
+
+2. Hosts File (/etc/hosts)
+-------bash 
+
+---> Local DNS override
+sudo nano /etc/hosts
+
+---> Add:
+127.0.0.1   localhost
+192.168.1.100  server1.local dev-server
+192.168.1.101  database.local
+
+---> Test
+ping server1.local
+
+
+3. Resolv.conf (/etc/resolv.conf)  [bash]
+
+# DNS configuration
+sudo nano /etc/resolv.conf
+
+# Add:
+nameserver 8.8.8.8
+nameserver 1.1.1.1
+options timeout:2 attempts:3
+
+
+🧪 Practical Lab Exercises  ---------
+------->> Exercise 1: Network Discovery  [bash]
+
+# 1. Find your IP and subnet
+ip a | grep inet
+ip route
+
+# 2. Find gateway
+ip route | grep default
+
+# 3. Trace path to Google
+traceroute google.com
+
+# 4. Check open ports on your system
+sudo ss -tulnp | grep LISTEN
+
+
+Exercise 2: SSH Setup  [ bash ]
+
+# 1. Generate SSH key
+ssh-keygen -t ed25519
+
+# 2. View public key
+cat ~/.ssh/id_ed25519.pub
+
+# 3. Setup GitHub SSH
+# GitHub → Settings → SSH Keys → Add new
+# Paste your public key
+
+# 4. Test connection
+ssh -T git@github.com
+# Should show: "Hi username! You've successfully authenticated..."
+
+
+------------>>>>>>>>>>>Exercise 3: Firewall Configuration    [ bash ]
+
+# 1. Reset firewall
+sudo ufw --force reset
+
+# 2. Set defaults
+sudo ufw default deny incoming
+sudo ufw default allow outgoing
+
+# 3. Allow essential services
+sudo ufw allow 22/tcp comment 'SSH'
+sudo ufw allow 80/tcp comment 'HTTP'
+sudo ufw allow 443/tcp comment 'HTTPS'
+
+# 4. Enable and check
+sudo ufw enable
+sudo ufw status verbose
+
+
+
+📊 Network Troubleshooting Checklist
+
+------>>>> When something doesn't work:
+
+1.  Ping gateway: ping 192.168.1.1
+
+2.  Ping external IP: ping 8.8.8.8
+
+3.  Ping domain: ping google.com
+
+  -> If #1 fails → Local network issue
+
+  -> If #2 fails → Internet issue
+
+  -> If #3 fails → DNS issue
+
+4.  Check DNS: nslookup google.com
+
+5.  Check ports: sudo ss -tulnp
+
+6.  Check firewall: sudo ufw status
+
+7.  Check routes: ip route
+
+
+📁 GitHub Repository Structure for Networking Notes [ text ]
+
+devops-learning/
+├── Day-1-Linux/
+│   ├── README.md
+│   ├── part1-basics.md
+│   └── part2-networking.md    # ← YEH FILE
+├── Day-2-Git/
+├── Day-3-Docker/
+└── resources/
+    ├── networking-cheatsheet.md
+    └── ports-reference.md
+
+
+File Content (part2-networking.md):
+
+# Day 1 - Part 2: Networking Fundamentals
+
+## 📅 Date: [Today's Date]
+
+## 🎯 Learning Objectives
+- [x] Understand IP addressing and subnetting
+- [x] Learn essential networking commands
+- [x] Master SSH for server management
+- [x] Configure firewall (UFW)
+- [x] Troubleshoot network issues
+
+## 🔧 Commands Practiced
+```bash
+# Network Info
+ip a
+ip route
+hostname -I
+
+# Connectivity
+ping google.com
+traceroute 8.8.8.8
+
+# DNS
+nslookup google.com
+dig example.com
+
+# Ports & Services
+sudo ss -tulnp
+netstat -ano
+
+# SSH
+ssh-keygen -t rsa -b 4096
+ssh-copy-id user@server
+
+# Web/Download
+curl -I https://google.com
+wget https://example.com/file.zip
+
+# Firewall
+sudo ufw status
+sudo ufw allow 22/tcp
+
+
+📚 Key Concepts Learned
+
+1. IP Addressing
+
+->  IPv4 vs IPv6
+->  Private vs Public IPs
+->  CIDR notation (/24, /16, etc.)
+
+2. SSH Security
+
+->  Public/Private key pairs
+
+->  Password-less authentication
+
+->  SSH config for productivity
+
+3. Firewall Management
+
+-> Default policies (deny incoming, allow outgoing)
+
+-> Port-based rules
+
+-> Rate limiting for security
+
+
+🧪 Lab Results
+
+-->> Successfully generated SSH keys
+-->> Configured UFW firewall
+-->> Tested network connectivity
+-->> Set up GitHub SSH authentication
+
+
+❓ Questions/Challenges
+
+1. Difference between TCP and UDP?
+2. How to setup static IP?
+3. What is NAT?
+
+
+📝 Next Steps
+
+-> Learn about VPNs and proxies
+
+-> Study network protocols (TCP/IP model)
+
+-> Practice with virtual networks
+
+
+---
+
+---------->>>>>>  🚀 Advanced Topics for Future  <<<<<<-------------
+
+### **1. Network Namespaces (Container Networking)**
+```bash
+
+# Create isolated network
+sudo ip netns add red
+sudo ip netns exec red ip a
+
+
+2. VPN Setup (WireGuard)
+
+# Install and configure VPN
+sudo apt install wireguard
+wg genkey | tee privatekey | wg pubkey > publickey
+
+
+3. Network Monitoring   [ BASH ]
+
+--->>>  Install monitoring tools
+sudo apt install nethogs iftop nload
+
+---->>>  Real-time monitoring
+sudo nethogs          # Per-process bandwidth
+sudo iftop            # Interface traffic
+nload                 # Simple bandwidth meter
+
+
+Day 1 Part 2 Completion Checklist
+
+-->>  Networking Concepts: IP, Subnet, Gateway, DNS
+
+-->>  Essential Commands: ip, ping, nslookup, ss
+
+-->>  SSH Setup: Key generation, GitHub integration
+
+-->>  Firewall: UFW basic configuration
+
+-->>  Troubleshooting: Connectivity testing flow
+
+-->>  Documentation: Notes in GitHub with proper structure
+
+-->>  Practice Lab: Complete all 3 exercises
+
+-->>  Real Test: SSH into a cloud server (AWS/Azure free tier)
+
+Pro Tip: Networking samajhne ke liye ek diagram banayein apne network ka. Draw.io ya Excalidraw use karke visual map banayein. Yeh concept clear karne me bahut help karega!
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
 
